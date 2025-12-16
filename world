@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Solo Campaign Panel</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#faf6f0;
+      --panel:#ffffff;
+      --card:#fdf9f2;
+      --header:#1e0f0a;
+      --nav:#2d180f;
+      --accent:#d4af37;
+      --accent2:#a67c00;
+      --text:#2c1a0d;
+      --muted:#7a5c3a;
+      --danger:#9f2b2b;
+      --success:#2b7a3d;
+      --border:#d9c2a3;
+      --shadow: 0 8px 24px rgba(0,0,0,0.12);
+      --radius: 16px;
+      --transition: all 0.20s ease;
+      --focus: 0 0 0 3px rgba(212,175,55,0.25);
+    }
+    body.dark{
+      --bg:#0f0a05;
+      --panel:#1a120d;
+      --card:#221a12;
+      --header:#000000;
+      --nav:#1a0f0a;
+      --accent:#e6c84a;
+      --accent2:#b89a2f;
+      --text:#f0e0d0;
+      --muted:#a68f6e;
+      --border:#3d2f1f;
+      --shadow: 0 8px 32px rgba(0,0,0,0.42);
+      --focus: 0 0 0 3px rgba(230,200,74,0.18);
+    }
+
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    body{
+      font-family: 'Roboto', system-ui, -apple-system, Segoe UI, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.55;
+      transition: var(--transition);
+    }
+
+    header{
+      background:var(--header);
+      color:#f4e4d3;
+      padding:18px 16px;
+      text-align:center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+    }
+    header h1{
+      font-family:'Cinzel', serif;
+      font-size:26px;
+      margin:0 0 6px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    header p{ opacity:.9; font-size:14px; }
+
+    nav{
+      background:var(--nav);
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:10px;
+      padding:12px;
+      position:sticky;
+      top:0;
+      z-index:100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    nav button{
+      background:transparent;
+      border:none;
+      color:#f4e4d3;
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:14px;
+      transition:var(--transition);
+      font-weight:500;
+    }
+    nav button:hover{ background:rgba(212,175,55,0.18); }
+    nav button.active{
+      background:var(--accent);
+      color:#1e0f0a;
+      font-weight:700;
+    }
+    nav button.secondary{
+      opacity:0.88;
+      border:1px solid rgba(244,228,211,0.18);
+    }
+
+    main{
+      max-width:1300px;
+      margin:0 auto;
+      padding:18px 14px 36px;
+    }
+
+    section{
+      display:none;
+      animation: fadeIn 0.35s ease;
+    }
+    section.active{ display:block; }
+    @keyframes fadeIn{
+      from{opacity:0; transform:translateY(8px);}
+      to{opacity:1; transform:none;}
+    }
+
+    h2{
+      font-family:'Cinzel', serif;
+      font-size:22px;
+      margin:0 0 14px;
+      color:var(--accent);
+      letter-spacing:0.2px;
+    }
+
+    .row{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .spacer{ flex:1; }
+    .muted{ color:var(--muted); opacity:.92; }
+    .hint{ font-size:13px; color:var(--muted); opacity:.85; margin-top:6px; }
+
+    .btn{
+      background:var(--accent2);
+      color:white;
+      border:none;
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:13.5px;
+      font-weight:600;
+      transition:var(--transition);
+      user-select:none;
+    }
+    .btn:hover{ background:var(--accent); transform:translateY(-1px); }
+    .btn:active{ transform:translateY(0px); }
+    .btn.ghost{
+      background:transparent;
+      border:1px solid var(--border);
+      color:var(--text);
+    }
+    .btn.danger{ background:var(--danger); }
+    .btn.success{ background:var(--success); }
+    .btn.small{ padding:7px 10px; font-size:13px; }
+
+    input, textarea, select{
+      width:100%;
+      padding:11px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:var(--card);
+      color:var(--text);
+      font-family:inherit;
+      font-size:14px;
+      transition:var(--transition);
+    }
+    input:focus, textarea:focus, select:focus{
+      outline:none;
+      box-shadow:var(--focus);
+      border-color:var(--accent);
+    }
+    textarea{ resize:vertical; min-height:100px; }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(330px, 1fr));
+      gap:16px;
+      margin-top:14px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+      transition:var(--transition);
+    }
+    .card:hover{ transform:translateY(-3px); box-shadow: 0 14px 36px rgba(0,0,0,0.16); }
+
+    .pill{
+      background:rgba(212,175,55,0.20);
+      color:var(--accent2);
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+    }
+    .hr{ height:1px; background:var(--border); margin:14px 0; opacity:0.7; }
+
+    .two{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .three{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    @media(max-width:900px){ .three{ grid-template-columns:1fr; } }
+    @media(max-width:760px){ .two{ grid-template-columns:1fr; } }
+
+    #saveDot{
+      position:fixed;
+      top:16px;
+      right:16px;
+      width:12px; height:12px;
+      border-radius:50%;
+      background:var(--success);
+      opacity:0;
+      transition:opacity 0.35s;
+      z-index:200;
+      box-shadow: 0 0 0 3px rgba(43,122,61,0.18);
+    }
+    #saveDot.show{ opacity:1; }
+
+    #errorBar{
+      display:none;
+      max-width:1300px;
+      margin:10px auto 0;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#ffe0e0;
+      border:1px solid #e88;
+      color:#900;
+    }
+    body.dark #errorBar{
+      background:#3d1b1b; color:#ffbbbb; border-color:#a44;
+    }
+
+    .bigResult{
+      padding:12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,0.03);
+      min-height:52px;
+      display:flex;
+      align-items:center;
+      font-weight:700;
+    }
+    body.dark .bigResult{ background:rgba(255,255,255,0.04); }
+
+    .soloChip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(212,175,55,0.12);
+      font-size:13px;
+      font-weight:700;
+      user-select:none;
+    }
+
+    .map-container{
+      position:relative;
+      overflow:hidden;
+      border-radius:var(--radius);
+      border:2px solid var(--border);
+      background:#000;
+      margin-top:14px;
+      height:70vh;
+    }
+    #mapImg{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:none;
+      cursor:grab;
+      transition:transform 0.08s;
+    }
+    #mapImg.dragging{ cursor:grabbing; }
+
+    .turn{
+      border:2px solid var(--accent);
+      border-radius:var(--radius);
+    }
+    .init-order{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      padding:12px;
+      background:var(--card);
+      border-radius:12px;
+      border:1px solid var(--border);
+      margin-top:12px;
+    }
+    .init-item{
+      padding:6px 10px;
+      background:rgba(212,175,55,0.18);
+      border-radius:10px;
+      font-size:13px;
+      font-weight:700;
+    }
+    .init-item.current{
+      background:var(--accent);
+      color:#1e0f0a;
+    }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      border:1px solid var(--border);
+      border-bottom-width:2px;
+      border-radius:8px;
+      padding:2px 6px;
+      font-size:12px;
+      opacity:.85;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="saveDot"></div>
+
+  <header>
+    <h1>Solo Campaign Panel</h1>
+    <p>Соло-кампания: журнал, персонаж, бой, квесты и оракулы — всё в одном файле</p>
+  </header>
+
+  <nav>
+    <button data-tab="dashboard" class="active">🏠 Соло</button>
+    <button data-tab="journal">📅 Журнал</button>
+    <button data-tab="character">🧙 Мой персонаж</button>
+    <button data-tab="combat">⚔️ Бой</button>
+    <button data-tab="quests">📜 Квесты</button>
+    <button data-tab="world">🗺️ Мир</button>
+    <button data-tab="map">🧭 Карта</button>
+    <button id="exportBtn" class="secondary">💾 Экспорт</button>
+    <button id="importBtn" class="secondary">📥 Импорт</button>
+    <button id="themeBtn" class="secondary">🌙 Тёмная</button>
+  </nav>
+
+  <div id="errorBar"><b>Ошибка:</b> <span id="errorText"></span></div>
+
+  <main>
+    <!-- SOLO DASHBOARD -->
+    <section id="dashboard" class="active">
+      <div class="row">
+        <h2>Соло-центр</h2>
+        <div class="spacer"></div>
+        <span class="soloChip">🧠 Оракул • 🎲 Кубы • ⚡ Твисты</span>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="row">
+            <h3 style="font-family:'Cinzel',serif;color:var(--accent);">Сцена сейчас</h3>
+            <div class="spacer"></div>
+            <span class="pill" id="scenePill">Сцена</span>
+          </div>
+          <label>Коротко: где я и что происходит?</label>
+          <input id="sceneTitle" placeholder="Напр.: Заброшенная часовня, полночь">
+          <label>Цель сцены (что ты хочешь добиться)</label>
+          <input id="sceneGoal" placeholder="Напр.: Найти дневник настоятеля">
+          <label>Заметки</label>
+          <textarea id="sceneNotes" rows="5" placeholder="Подробности, NPC, зацепки..."></textarea>
+
+          <div class="hr"></div>
+          <div class="row">
+            <button class="btn" id="saveSceneBtn">💾 Сохранить сцену</button>
+            <button class="btn ghost" id="newSceneBtn">✨ Новая сцена</button>
+          </div>
+          <div class="hint">Совет: для соло игры “сцена” — это как кадр в кино. Одна цель → один результат.</div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-family:'Cinzel',serif;color:var(--accent); margin-bottom:10px;">Оракул Да/Нет</h3>
+
+          <label>Вопрос (на который можно ответить Да/Нет)</label>
+          <input id="oracleQ" placeholder="Напр.: Есть ли здесь скрытая дверь?">
+
+          <div class="two" style="margin-top:10px;">
+            <div>
+              <label>Вероятность</label>
+              <select id="oracleOdds">
+                <option value="very_unlikely">Очень маловероятно</option>
+                <option value="unlikely">Маловероятно</option>
+                <option value="50" selected>50/50</option>
+                <option value="likely">Вероятно</option>
+                <option value="very_likely">Очень вероятно</option>
+              </select>
+            </div>
+            <div>
+              <label>Результат</label>
+              <div class="bigResult" id="oracleResult">—</div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn" id="oracleRollBtn">🎲 Спросить оракул</button>
+            <button class="btn ghost" id="oracleClearBtn">Сброс</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <h3 style="font-family:'Cinzel',serif;color:var(--accent); margin-bottom:10px;">Твист / Событие</h3>
+          <div class="two">
+            <div>
+              <label>Твист</label>
+              <div class="bigResult" id="twistResult">—</div>
+            </div>
+            <div>
+              <label>Сцена-старт (быстрый сетап)</label>
+              <div class="bigResult" id="sceneSeedResult">—</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn" id="twistBtn">⚡ Твист</button>
+            <button class="btn" id="sceneSeedBtn">🎭 Сцена</button>
+          </div>
+
+          <div class="hint">Соло-фокус: когда “не знаешь что дальше” — нажимай “Сцена” или “Твист” и игра продолжится.</div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-family:'Cinzel',serif;color:var(--accent); margin-bottom:10px;">Кубы и генераторы</h3>
+          <div class="three">
+            <div>
+              <label>Куб</label>
+              <select id="dieSelect">
+                <option value="4">d4</option>
+                <option value="6">d6</option>
+                <option value="8">d8</option>
+                <option value="10">d10</option>
+                <option value="12">d12</option>
+                <option value="20" selected>d20</option>
+                <option value="100">d100</option>
+              </select>
+            </div>
+            <div>
+              <label>Кол-во</label>
+              <input id="dieCount" type="number" min="1" value="1">
+            </div>
+            <div>
+              <label>Модификатор</label>
+              <input id="dieMod" type="number" value="0">
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn" id="rollDiceBtn">🎲 Бросить</button>
+            <button class="btn ghost" id="copyDiceBtn">📋 Скопировать</button>
+          </div>
+          <div class="bigResult" id="diceResult" style="margin-top:10px;">—</div>
+
+          <div class="hr"></div>
+
+          <div class="two">
+            <div>
+              <h3 style="font-family:'Cinzel',serif;color:var(--accent); margin-bottom:10px;">NPC</h3>
+              <div class="bigResult" id="npcResult">—</div>
+              <div class="row" style="margin-top:10px;">
+                <button class="btn" id="npcBtn">🧑‍🤝‍🧑 Сгенерировать</button>
+                <button class="btn ghost" id="npcToWorldBtn">➕ В “Мир”</button>
+              </div>
+            </div>
+            <div>
+              <h3 style="font-family:'Cinzel',serif;color:var(--accent); margin-bottom:10px;">Находка</h3>
+              <div class="bigResult" id="lootResult">—</div>
+              <div class="row" style="margin-top:10px;">
+                <button class="btn" id="lootBtn">🎁 Находка</button>
+                <button class="btn ghost" id="logLootBtn">📝 В журнал</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="hint">Генераторы сделаны под соло: быстро получить “смысл” и двинуть историю.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JOURNAL -->
+    <section id="journal">
+      <div class="row">
+        <h2>Журнал сессий</h2>
+        <div class="spacer"></div>
+        <button class="btn" id="addSessionBtn">➕ Новая запись</button>
+      </div>
+      <div class="hint">Для соло: лучше писать не “что было”, а “что изменилось”: новые факты, последствия, зацепки.</div>
+      <div id="sessionsGrid" class="grid"></div>
+    </section>
+
+    <!-- CHARACTER (single) -->
+    <section id="character">
+      <div class="row">
+        <h2>Мой персонаж</h2>
+        <div class="spacer"></div>
+        <button class="btn ghost" id="resetCharBtn">Сбросить шаблон</button>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3 style="font-family:'Cinzel',serif;color:var(--accent);">Лист</h3>
+          <div class="two">
+            <div>
+              <label>Имя</label>
+              <input id="pcName">
+            </div>
+            <div>
+              <label>Раса / Происхождение</label>
+              <input id="pcRace">
+            </div>
+          </div>
+
+          <div class="two">
+            <div>
+              <label>Класс / Роль</label>
+              <input id="pcClass">
+            </div>
+            <div>
+              <label>Уровень</label>
+              <input id="pcLevel" type="number" min="1" max="20">
+            </div>
+          </div>
+
+          <div class="two">
+            <div>
+              <label>HP</label>
+              <input id="pcHp" type="number" min="0">
+            </div>
+            <div>
+              <label>Max HP</label>
+              <input id="pcMaxHp" type="number" min="0">
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <label>Кратко: мотивация / цель персонажа</label>
+          <input id="pcDrive" placeholder="Напр.: искупить вину / найти сестру">
+
+          <label>Инвентарь / важное</label>
+          <textarea id="pcNotes" rows="6"></textarea>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn success" id="savePcBtn">💾 Сохранить</button>
+            <span class="muted">HP синхронизируется с боем автоматически.</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-family:'Cinzel',serif;color:var(--accent);">Соло-метрики</h3>
+          <div class="hint">Это не “правила”, а чтобы держать темп и драму.</div>
+
+          <label>Угроза / напряжение (0–10)</label>
+          <input id="threat" type="range" min="0" max="10">
+          <div class="row" style="justify-content:space-between;">
+            <span class="muted">Спокойно</span>
+            <span class="pill" id="threatPill">0</span>
+            <span class="muted">Критично</span>
+          </div>
+
+          <div class="hr"></div>
+
+          <label>Прогресс “большой цели” (0–10)</label>
+          <input id="goalProg" type="range" min="0" max="10">
+          <div class="row" style="justify-content:space-between;">
+            <span class="muted">Старт</span>
+            <span class="pill" id="goalProgPill">0</span>
+            <span class="muted">Финал</span>
+          </div>
+
+          <div class="row" style="margin-top:12px;">
+            <button class="btn" id="soloCheckpointBtn">🧷 Чекпоинт в журнал</button>
+            <button class="btn ghost" id="soloPushBtn">⚡ Поднять напряжение</button>
+          </div>
+
+          <div class="hint">“Поднять напряжение” — быстрый способ заставить мир реагировать на тебя.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMBAT -->
+    <section id="combat">
+      <div class="row">
+        <h2>Трекер боя</h2>
+        <div class="spacer"></div>
+        <span class="pill" id="roundPill">Раунд: 1</span>
+        <span class="pill" id="turnPill">Ход: —</span>
+      </div>
+
+      <div class="init-order" id="initOrder"></div>
+
+      <div class="grid">
+        <div class="card">
+          <h3 style="font-family:'Cinzel',serif;color:var(--accent);">Управление</h3>
+
+          <div class="hr"></div>
+
+          <h3 style="font-family:'Cinzel',serif;color:var(--accent); margin-bottom:10px;">Ты</h3>
+          <div class="row">
+            <button class="btn" id="addPcToCombatBtn">➕ Добавить моего персонажа</button>
+            <button class="btn ghost" id="syncPcCombatBtn">🔄 Синхронизировать HP</button>
+          </div>
+          <div class="hint">Соло: ты всегда можешь быстро вернуть HP/MaxHP в бой из своего листа.</div>
+
+          <div class="hr"></div>
+
+          <h3 style="font-family:'Cinzel',serif;color:var(--accent); margin-bottom:10px;">Враги</h3>
+          <div class="two">
+            <div><label>Имя</label><input id="mobName" value="Гоблин"></div>
+            <div><label>Кол-во</label><input id="mobCount" type="number" value="1" min="1"></div>
+          </div>
+          <div class="two">
+            <div><label>HP</label><input id="mobMaxHp" type="number" value="7" min="0"></div>
+            <div><label>Мод. инициативы</label><input id="mobInitMod" type="number" value="2"></div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn" id="addMobBtn">➕ Добавить</button>
+            <button class="btn ghost" id="clearCombatBtn">🗑️ Очистить</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row">
+            <button class="btn" id="rollInitBtn">🎲 Бросить инициативу</button>
+            <button class="btn ghost" id="prevTurnBtn">⬅️</button>
+            <button class="btn" id="nextTurnBtn">➡️</button>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn ghost" id="newRoundBtn">⏭️ Новый раунд</button>
+            <button class="btn ghost" id="sortInitBtn">↕️ Сортировать</button>
+          </div>
+
+          <div class="hint">Подсказка: <span class="kbd">➡️</span> удобно жать как “следующий кадр”. В соло не надо усложнять.</div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-family:'Cinzel',serif;color:var(--accent);">Участники</h3>
+          <div id="combatGrid" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); margin-top:12px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUESTS -->
+    <section id="quests">
+      <div class="row">
+        <h2>Квесты и цели</h2>
+        <div class="spacer"></div>
+        <button class="btn" id="addQuestBtn">➕ Новый квест</button>
+      </div>
+      <div class="hint">Соло: держи 1–2 активных квеста. Остальное — “фон”, иначе распад темпа.</div>
+      <div id="questsGrid" class="grid"></div>
+    </section>
+
+    <!-- WORLD -->
+    <section id="world">
+      <div class="row">
+        <h2>Мир</h2>
+        <div class="spacer"></div>
+        <button class="btn" id="addNpcBtn">➕ NPC</button>
+        <button class="btn ghost" id="addLocBtn">➕ Локация</button>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3 style="font-family:'Cinzel',serif;color:var(--accent);">NPC</h3>
+          <div id="npcGrid" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));"></div>
+        </div>
+        <div class="card">
+          <h3 style="font-family:'Cinzel',serif;color:var(--accent);">Локации</h3>
+          <div id="locGrid" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAP -->
+    <section id="map">
+      <div class="row">
+        <h2>Карта кампании</h2>
+        <div class="spacer"></div>
+        <button class="btn ghost" id="clearMapBtn">Убрать карту</button>
+      </div>
+      <div class="hint">Карта хранится как файл в этом открытии (чтобы не убивать сейвы). Для постоянного хранения используй Экспорт/Импорт.</div>
+      <input type="file" id="mapFile" accept="image/*" style="margin-top:12px;">
+      <div class="map-container" id="mapContainer">
+        <img id="mapImg" alt="Карта">
+      </div>
+    </section>
+
+    <input type="file" id="importFile" accept=".json,application/json" style="display:none;">
+  </main>
+
+  <script>
+    /**********************
+     * Ultra-normalized Solo App
+     * - no inline handlers
+     * - safe storage + debounce
+     * - clean state schema + migration
+     **********************/
+
+    // DOM helpers
+    const $ = (s, root=document) => root.querySelector(s);
+    const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+
+    const STORAGE_KEY = "solo_campaign_panel_v1";
+
+    const uid = () => Date.now() + Math.floor(Math.random() * 100000);
+    const asNum = (v, f=0) => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : f;
+    };
+    const clamp = (n,a,b) => Math.max(a, Math.min(b, n));
+    const nowRu = () => new Date().toLocaleString("ru-RU");
+
+    // Save feedback
+    const saveDot = $("#saveDot");
+    function flashSaved(){
+      saveDot.classList.add("show");
+      setTimeout(()=>saveDot.classList.remove("show"), 650);
+    }
+    function showError(msg){
+      $("#errorText").textContent = msg;
+      $("#errorBar").style.display = "block";
+    }
+    function clearError(){
+      $("#errorBar").style.display = "none";
+    }
+
+    // Debounced save
+    let saveTimer = null;
+    function scheduleSave(){
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(()=>saveState(), 180);
+    }
+
+    // State schema
+    function defaultState(){
+      return {
+        version: 1,
+        theme: "light",
+        scene: { title:"", goal:"", notes:"", updatedAt:"" },
+
+        solo: {
+          threat: 0,
+          goalProgress: 0
+        },
+
+        pc: {
+          name: "Аки",
+          race: "",
+          class: "",
+          level: 1,
+          hp: 10,
+          maxHp: 10,
+          drive: "",
+          notes: ""
+        },
+
+        journal: [
+          { id: uid(), date: nowRu(), title: "Старт", text: "Начало соло-кампании. Что изменилось в мире после первой сцены?" }
+        ],
+
+        quests: [],
+
+        world: {
+          npcs: [],
+          locations: []
+        },
+
+        combat: {
+          round: 1,
+          turnIndex: 0,
+          participants: []
+        }
+      };
+    }
+
+    function migrateState(s){
+      const base = defaultState();
+      if(!s || typeof s !== "object") return base;
+
+      // shallow merge with nested merges
+      const merged = {
+        ...base,
+        ...s,
+        scene: { ...base.scene, ...(s.scene||{}) },
+        solo: { ...base.solo, ...(s.solo||{}) },
+        pc: { ...base.pc, ...(s.pc||{}) },
+        world: { ...base.world, ...(s.world||{}), npcs: (s.world?.npcs)||[], locations: (s.world?.locations)||[] },
+        combat: { ...base.combat, ...(s.combat||{}), participants: (s.combat?.participants)||[] },
+      };
+
+      // ensure arrays
+      merged.journal = Array.isArray(merged.journal) ? merged.journal : base.journal;
+      merged.quests = Array.isArray(merged.quests) ? merged.quests : [];
+      return merged;
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return defaultState();
+        const parsed = JSON.parse(raw);
+        clearError();
+        return migrateState(parsed);
+      }catch(e){
+        showError("Не удалось загрузить сохранение (storage/JSON). Можно сделать экспорт, затем очистить данные сайта.");
+        return defaultState();
+      }
+    }
+
+    function saveState(){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        clearError();
+        flashSaved();
+      }catch(e){
+        showError("Не удаётся сохранить (возможно, браузер запретил storage или нет места). Сделай Экспорт.");
+      }
+    }
+
+    let state = loadState();
+
+    /**********************
+     * UI: tabs + theme
+     **********************/
+    function openTab(id){
+      $$("nav button[data-tab]").forEach(b=>b.classList.remove("active"));
+      $$("main section").forEach(s=>s.classList.remove("active"));
+      $(`nav button[data-tab="${id}"]`)?.classList.add("active");
+      $(`#${id}`)?.classList.add("active");
+    }
+    $$("nav button[data-tab]").forEach(btn=>{
+      btn.addEventListener("click", ()=>openTab(btn.dataset.tab));
+    });
+
+    function applyTheme(){
+      document.body.classList.toggle("dark", state.theme === "dark");
+      $("#themeBtn").textContent = state.theme === "dark" ? "☀️ Светлая" : "🌙 Тёмная";
+    }
+    $("#themeBtn").addEventListener("click", ()=>{
+      state.theme = (state.theme === "dark") ? "light" : "dark";
+      saveState();
+      applyTheme();
+    });
+
+    /**********************
+     * Export / Import (plain JSON)
+     **********************/
+    $("#exportBtn").addEventListener("click", ()=>{
+      try{
+        const data = JSON.stringify(state, null, 2);
+        const blob = new Blob([data], {type:"application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `solo_campaign_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        setTimeout(()=>URL.revokeObjectURL(url), 1000);
+      }catch{
+        showError("Экспорт не удался.");
+      }
+    });
+
+    $("#importBtn").addEventListener("click", ()=>$("#importFile").click());
+    $("#importFile").addEventListener("change", (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try{
+          const imported = JSON.parse(String(r.result || "{}"));
+          state = migrateState(imported);
+          saveState();
+          // перерендер всего
+          renderAll();
+          showError("Импорт выполнен ✅ (сообщение можно игнорировать/обновить страницу)");
+          setTimeout(()=>clearError(), 1800);
+        }catch{
+          showError("Неверный JSON-файл импорта.");
+        }
+        e.target.value = "";
+      };
+      r.readAsText(file);
+    });
+
+    /**********************
+     * SOLO: Scene
+     **********************/
+    function renderScene(){
+      $("#sceneTitle").value = state.scene.title || "";
+      $("#sceneGoal").value = state.scene.goal || "";
+      $("#sceneNotes").value = state.scene.notes || "";
+      $("#scenePill").textContent = state.scene.updatedAt ? `Обновлено: ${state.scene.updatedAt}` : "Сцена";
+    }
+
+    function saveSceneFromInputs(){
+      state.scene.title = $("#sceneTitle").value.trim();
+      state.scene.goal = $("#sceneGoal").value.trim();
+      state.scene.notes = $("#sceneNotes").value;
+      state.scene.updatedAt = nowRu();
+      scheduleSave();
+      renderScene();
+    }
+
+    $("#saveSceneBtn").addEventListener("click", saveSceneFromInputs);
+
+    $("#newSceneBtn").addEventListener("click", ()=>{
+      state.scene = { title:"", goal:"", notes:"", updatedAt: nowRu() };
+      scheduleSave();
+      renderScene();
+    });
+
+    // live save (gentle)
+    ["sceneTitle","sceneGoal","sceneNotes"].forEach(id=>{
+      $("#"+id).addEventListener("input", ()=> {
+        state.scene.updatedAt = nowRu();
+        state.scene[id==="sceneTitle" ? "title" : id==="sceneGoal" ? "goal" : "notes"] = $("#"+id).value;
+        scheduleSave();
+        $("#scenePill").textContent = `Обновлено: ${state.scene.updatedAt}`;
+      });
+    });
+
+    /**********************
+     * SOLO: Oracle + Twist + Seeds
+     **********************/
+    const oddsMap = {
+      very_unlikely: 0.2,
+      unlikely: 0.35,
+      "50": 0.5,
+      likely: 0.65,
+      very_likely: 0.8
+    };
+
+    function roll(n){ return Math.floor(Math.random()*n)+1; }
+
+    function oracleYesNo(prob){
+      // returns: {answer, nuance}
+      const r = Math.random();
+      const yes = r < prob;
+
+      // nuance: "и..." or "но..."
+      const nuanceRoll = roll(100);
+      let nuance = "";
+      if(nuanceRoll <= 12) nuance = yes ? "ДА, и..." : "НЕТ, и...";
+      else if(nuanceRoll >= 89) nuance = yes ? "ДА, но..." : "НЕТ, но...";
+      else nuance = yes ? "ДА" : "НЕТ";
+
+      // rare exceptional
+      const ex = roll(100);
+      if(ex <= 4) nuance = yes ? "ОЧЕНЬ ДА" : "ОЧЕНЬ НЕТ";
+
+      return { answer: yes, nuance };
+    }
+
+    const twistTable = [
+      "Неожиданный союзник вмешивается",
+      "Скрытая цена успеха",
+      "Кто-то следит за тобой",
+      "План врага уже в действии",
+      "То, что казалось правдой — ложь",
+      "Место меняется (погода/магия/обвал)",
+      "Ресурс иссякает (свет, время, еда)",
+      "Приходит срочная весть",
+      "Невинный страдает из-за твоих действий",
+      "Ты находишь улику, которая всё меняет"
+    ];
+
+    const sceneSeeds = [
+      "Засада в узком месте",
+      "Разговор с тем, кто знает слишком много",
+      "Запретная дверь приоткрыта",
+      "Старая карта ведёт к ошибке",
+      "Тишина перед бурей",
+      "Обряд уже начался",
+      "Тропа приводит к свежим следам",
+      "Кто-то просит помощи и скрывает мотив",
+      "Странный звук из глубины",
+      "Сделка: выгодно, но опасно"
+    ];
+
+    $("#oracleRollBtn").addEventListener("click", ()=>{
+      const q = $("#oracleQ").value.trim();
+      const oddsKey = $("#oracleOdds").value;
+      const prob = oddsKey === "50" ? 0.5 : oddsMap[oddsKey] ?? 0.5;
+
+      const res = oracleYesNo(prob);
+      const qPart = q ? `Вопрос: “${q}” → ` : "";
+      $("#oracleResult").textContent = qPart + res.nuance;
+
+      // log into journal as a tiny line if question exists
+      if(q){
+        addQuickJournalLine(`Оракул: ${q} → ${res.nuance}`);
+      }
+    });
+
+    $("#oracleClearBtn").addEventListener("click", ()=>{
+      $("#oracleQ").value = "";
+      $("#oracleResult").textContent = "—";
+    });
+
+    $("#twistBtn").addEventListener("click", ()=>{
+      const t = twistTable[roll(twistTable.length)-1];
+      $("#twistResult").textContent = t;
+      addQuickJournalLine(`Твист: ${t}`);
+    });
+
+    $("#sceneSeedBtn").addEventListener("click", ()=>{
+      const s = sceneSeeds[roll(sceneSeeds.length)-1];
+      $("#sceneSeedResult").textContent = s;
+      addQuickJournalLine(`Сцена: ${s}`);
+    });
+
+    /**********************
+     * Dice
+     **********************/
+    let lastDiceText = "";
+    $("#rollDiceBtn").addEventListener("click", ()=>{
+      const sides = asNum($("#dieSelect").value, 20);
+      const count = clamp(asNum($("#dieCount").value, 1), 1, 50);
+      const mod = asNum($("#dieMod").value, 0);
+
+      const rolls = [];
+      for(let i=0;i<count;i++) rolls.push(roll(sides));
+      const sum = rolls.reduce((a,b)=>a+b,0);
+      const total = sum + mod;
+
+      lastDiceText = `${count}d${sides}${mod>=0?`+${mod}`:`${mod}`} → [${rolls.join(", ")}] = ${total}`;
+      $("#diceResult").textContent = lastDiceText;
+      addQuickJournalLine(`Бросок: ${lastDiceText}`);
+    });
+
+    $("#copyDiceBtn").addEventListener("click", async ()=>{
+      if(!lastDiceText) return;
+      try{
+        await navigator.clipboard.writeText(lastDiceText);
+        $("#diceResult").textContent = lastDiceText + " ✅ скопировано";
+        setTimeout(()=>$("#diceResult").textContent = lastDiceText, 900);
+      }catch{
+        // ignore
+      }
+    });
+
+    /**********************
+     * Generators: NPC / Loot
+     **********************/
+    const npcNames = ["Альма","Рагнар","Селин","Кай","Мира","Оррен","Торин","Вера","Люций","Найла","Сив","Эйрик"];
+    const npcTraits = ["нервный","вежливый","жестокий","харизматичный","усталый","хитрый","наивный","мстительный","холодный","добрый","прагматичный","одержимый"];
+    const npcGoal = ["хочет деньги","ищет защиту","мечтает о славе","боится разоблачения","охотится за артефактом","скрывает преступление","жаждет мести","хочет сделки","ищет пропавшего","служит культу"];
+    const lootTable = ["кольцо с гербом","письмо с печатью","ключ необычной формы","зелье неизвестного эффекта","карта с пометками","амулет с трещиной","мешочек монет","странный кристалл","обломок меча","дневник с вырванными страницами"];
+
+    function genNpcText(){
+      const name = npcNames[roll(npcNames.length)-1];
+      const tr = npcTraits[roll(npcTraits.length)-1];
+      const g = npcGoal[roll(npcGoal.length)-1];
+      return `${name} — ${tr}, ${g}`;
+    }
+
+    $("#npcBtn").addEventListener("click", ()=>{
+      const t = genNpcText();
+      $("#npcResult").textContent = t;
+      scheduleSave();
+    });
+
+    $("#npcToWorldBtn").addEventListener("click", ()=>{
+      const t = $("#npcResult").textContent.trim();
+      if(!t || t==="—") return;
+      state.world.npcs.unshift({ id: uid(), name: t.split("—")[0].trim(), role: t, notes:"" });
+      scheduleSave();
+      renderWorld();
+      openTab("world");
+    });
+
+    $("#lootBtn").addEventListener("click", ()=>{
+      const t = lootTable[roll(lootTable.length)-1];
+      $("#lootResult").textContent = t;
+      scheduleSave();
+    });
+
+    $("#logLootBtn").addEventListener("click", ()=>{
+      const t = $("#lootResult").textContent.trim();
+      if(!t || t==="—") return;
+      addQuickJournalLine(`Находка: ${t}`);
+    });
+
+    /**********************
+     * Journal
+     **********************/
+    function addQuickJournalLine(line){
+      // put into latest entry (top) or create if none
+      if(!state.journal.length){
+        state.journal.unshift({ id: uid(), date: nowRu(), title: "Заметки", text: "" });
+      }
+      state.journal[0].text = (state.journal[0].text ? state.journal[0].text + "\n" : "") + "• " + line;
+      scheduleSave();
+      renderJournal();
+    }
+
+    function addJournalEntry(){
+      state.journal.unshift({
+        id: uid(),
+        date: nowRu(),
+        title: "Новая запись",
+        text: ""
+      });
+      scheduleSave();
+      renderJournal();
+    }
+
+    function deleteJournalEntry(id){
+      if(!confirm("Удалить запись журнала?")) return;
+      state.journal = state.journal.filter(x=>x.id!==id);
+      scheduleSave();
+      renderJournal();
+    }
+
+    function renderJournal(){
+      const grid = $("#sessionsGrid");
+      grid.innerHTML = "";
+      if(state.journal.length === 0){
+        grid.innerHTML = `<div class="card"><b>Пока пусто.</b><div class="hint">Нажми “Новая запись”.</div></div>`;
+        return;
+      }
+
+      for(const s of state.journal){
+        const el = document.createElement("div");
+        el.className = "card";
+        el.innerHTML = `
+          <div class="row">
+            <span class="pill">${s.date}</span>
+            <div class="spacer"></div>
+            <button class="btn small danger" data-del>🗑️</button>
+          </div>
+
+          <label>Название</label>
+          <input data-title>
+
+          <label>Заметки</label>
+          <textarea data-text rows="8" placeholder="Что изменилось? Какие последствия? Какие новые зацепки?"></textarea>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn ghost small" data-to-scene>↗️ В сцену</button>
+          </div>
+        `;
+
+        const title = el.querySelector("[data-title]");
+        const text = el.querySelector("[data-text]");
+        title.value = s.title || "";
+        text.value = s.text || "";
+
+        el.querySelector("[data-del]").addEventListener("click", ()=>deleteJournalEntry(s.id));
+
+        title.addEventListener("input", ()=>{
+          s.title = title.value;
+          scheduleSave();
+        });
+        text.addEventListener("input", ()=>{
+          s.text = text.value;
+          scheduleSave();
+        });
+
+        el.querySelector("[data-to-scene]").addEventListener("click", ()=>{
+          // quick copy last lines into scene notes
+          state.scene.notes = (state.scene.notes ? state.scene.notes + "\n\n" : "") + `Из журнала (${s.title}):\n` + (s.text || "");
+          state.scene.updatedAt = nowRu();
+          scheduleSave();
+          renderScene();
+          openTab("dashboard");
+        });
+
+        grid.appendChild(el);
+      }
+    }
+
+    $("#addSessionBtn").addEventListener("click", addJournalEntry);
+
+    /**********************
+     * Character (single PC)
+     **********************/
+    function renderPc(){
+      const pc = state.pc;
+      $("#pcName").value = pc.name || "";
+      $("#pcRace").value = pc.race || "";
+      $("#pcClass").value = pc.class || "";
+      $("#pcLevel").value = asNum(pc.level, 1);
+      $("#pcHp").value = asNum(pc.hp, 0);
+      $("#pcMaxHp").value = asNum(pc.maxHp, 0);
+      $("#pcDrive").value = pc.drive || "";
+      $("#pcNotes").value = pc.notes || "";
+
+      $("#threat").value = clamp(asNum(state.solo.threat,0), 0, 10);
+      $("#goalProg").value = clamp(asNum(state.solo.goalProgress,0), 0, 10);
+      $("#threatPill").textContent = String($("#threat").value);
+      $("#goalProgPill").textContent = String($("#goalProg").value);
+    }
+
+    function savePcFromInputs(){
+      const pc = state.pc;
+      pc.name = $("#pcName").value.trim() || "Аки";
+      pc.race = $("#pcRace").value.trim();
+      pc.class = $("#pcClass").value.trim();
+      pc.level = clamp(asNum($("#pcLevel").value,1), 1, 20);
+
+      pc.maxHp = Math.max(0, asNum($("#pcMaxHp").value,10));
+      pc.hp = clamp(asNum($("#pcHp").value,10), 0, pc.maxHp);
+
+      pc.drive = $("#pcDrive").value.trim();
+      pc.notes = $("#pcNotes").value;
+
+      state.solo.threat = clamp(asNum($("#threat").value,0), 0, 10);
+      state.solo.goalProgress = clamp(asNum($("#goalProg").value,0), 0, 10);
+
+      scheduleSave();
+      renderPc();
+      syncPcToCombat();
+      renderCombat();
+    }
+
+    $("#savePcBtn").addEventListener("click", savePcFromInputs);
+
+    ["pcName","pcRace","pcClass","pcLevel","pcHp","pcMaxHp","pcDrive","pcNotes"].forEach(id=>{
+      $("#"+id).addEventListener("input", savePcFromInputs);
+    });
+    $("#threat").addEventListener("input", ()=>{
+      state.solo.threat = asNum($("#threat").value,0);
+      $("#threatPill").textContent = String(state.solo.threat);
+      scheduleSave();
+    });
+    $("#goalProg").addEventListener("input", ()=>{
+      state.solo.goalProgress = asNum($("#goalProg").value,0);
+      $("#goalProgPill").textContent = String(state.solo.goalProgress);
+      scheduleSave();
+    });
+
+    $("#soloCheckpointBtn").addEventListener("click", ()=>{
+      const pc = state.pc;
+      addJournalEntry();
+      state.journal[0].title = `Чекпоинт — ${nowRu()}`;
+      state.journal[0].text =
+`Сцена: ${state.scene.title || "—"}
+Цель: ${state.scene.goal || "—"}
+Напряжение: ${state.solo.threat}/10
+Прогресс цели: ${state.solo.goalProgress}/10
+PC: ${pc.name} (${pc.class||"—"} ${pc.level}) HP ${pc.hp}/${pc.maxHp}
+Ключевое:`;
+      scheduleSave();
+      renderJournal();
+      openTab("journal");
+    });
+
+    $("#soloPushBtn").addEventListener("click", ()=>{
+      state.solo.threat = clamp(state.solo.threat + 1, 0, 10);
+      scheduleSave();
+      renderPc();
+      const t = twistTable[roll(twistTable.length)-1];
+      $("#twistResult").textContent = t;
+      addQuickJournalLine(`Напряжение ↑ (${state.solo.threat}/10). Реакция мира: ${t}`);
+      openTab("dashboard");
+    });
+
+    $("#resetCharBtn").addEventListener("click", ()=>{
+      if(!confirm("Сбросить персонажа к шаблону?")) return;
+      state.pc = defaultState().pc;
+      scheduleSave();
+      renderPc();
+      syncPcToCombat();
+      renderCombat();
+    });
+
+    /**********************
+     * Quests
+     **********************/
+    function addQuest(){
+      state.quests.unshift({ id: uid(), title:"Новый квест", status:"active", notes:"", progress:0 });
+      scheduleSave();
+      renderQuests();
+    }
+
+    function deleteQuest(id){
+      if(!confirm("Удалить квест?")) return;
+      state.quests = state.quests.filter(q=>q.id!==id);
+      scheduleSave();
+      renderQuests();
+    }
+
+    function renderQuests(){
+      const grid = $("#questsGrid");
+      grid.innerHTML = "";
+      if(state.quests.length === 0){
+        grid.innerHTML = `<div class="card"><b>Квестов нет.</b><div class="hint">Создай один активный квест и один побочный — больше не надо.</div></div>`;
+        return;
+      }
+
+      for(const q of state.quests){
+        const el = document.createElement("div");
+        el.className = "card";
+        el.innerHTML = `
+          <div class="row">
+            <span class="pill">${q.status==="done" ? "✅ Завершён" : q.status==="paused" ? "⏸️ Пауза" : "🟡 Активен"}</span>
+            <div class="spacer"></div>
+            <button class="btn small danger" data-del>🗑️</button>
+          </div>
+
+          <label>Название</label>
+          <input data-title>
+
+          <div class="two">
+            <div>
+              <label>Статус</label>
+              <select data-status>
+                <option value="active">Активен</option>
+                <option value="paused">Пауза</option>
+                <option value="done">Завершён</option>
+              </select>
+            </div>
+            <div>
+              <label>Прогресс (0–10)</label>
+              <input data-prog type="range" min="0" max="10">
+              <div class="row" style="justify-content:space-between; margin-top:6px;">
+                <span class="muted">0</span>
+                <span class="pill" data-progPill>0</span>
+                <span class="muted">10</span>
+              </div>
+            </div>
+          </div>
+
+          <label>Заметки</label>
+          <textarea data-notes rows="5" placeholder="Что нужно сделать? Какие препятствия?">${q.notes||""}</textarea>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn ghost small" data-log>📝 В журнал</button>
+          </div>
+        `;
+
+        const title = el.querySelector("[data-title]");
+        const status = el.querySelector("[data-status]");
+        const prog = el.querySelector("[data-prog]");
+        const progPill = el.querySelector("[data-progPill]");
+        const notes = el.querySelector("[data-notes]");
+
+        title.value = q.title || "";
+        status.value = q.status || "active";
+        prog.value = clamp(asNum(q.progress,0), 0, 10);
+        progPill.textContent = String(prog.value);
+
+        el.querySelector("[data-del]").addEventListener("click", ()=>deleteQuest(q.id));
+
+        title.addEventListener("input", ()=>{ q.title = title.value; scheduleSave(); });
+        status.addEventListener("change", ()=>{ q.status = status.value; scheduleSave(); renderQuests(); });
+        prog.addEventListener("input", ()=>{ q.progress = asNum(prog.value,0); progPill.textContent = String(q.progress); scheduleSave(); });
+        notes.addEventListener("input", ()=>{ q.notes = notes.value; scheduleSave(); });
+
+        el.querySelector("[data-log]").addEventListener("click", ()=>{
+          addQuickJournalLine(`Квест: ${q.title} — статус: ${q.status}, прогресс: ${q.progress}/10`);
+        });
+
+        grid.appendChild(el);
+      }
+    }
+
+    $("#addQuestBtn").addEventListener("click", addQuest);
+
+    /**********************
+     * World: NPC + Locations
+     **********************/
+    function addNpc(){
+      state.world.npcs.unshift({ id: uid(), name: "Новый NPC", role: "", notes: "" });
+      scheduleSave();
+      renderWorld();
+    }
+    function addLoc(){
+      state.world.locations.unshift({ id: uid(), name: "Новая локация", tags: "", notes: "" });
+      scheduleSave();
+      renderWorld();
+    }
+
+    function renderWorld(){
+      const npcGrid = $("#npcGrid");
+      const locGrid = $("#locGrid");
+      npcGrid.innerHTML = "";
+      locGrid.innerHTML = "";
+
+      if(state.world.npcs.length === 0){
+        npcGrid.innerHTML = `<div class="card"><b>Пока нет NPC.</b><div class="hint">Нажми “NPC” или сгенерируй в Соло.</div></div>`;
+      }else{
+        for(const n of state.world.npcs){
+          const el = document.createElement("div");
+          el.className = "card";
+          el.innerHTML = `
+            <div class="row">
+              <span class="pill">NPC</span>
+              <div class="spacer"></div>
+              <button class="btn small danger" data-del>🗑️</button>
+            </div>
+            <label>Имя</label>
+            <input data-name>
+            <label>Роль / крючок</label>
+            <input data-role placeholder="Кто он и зачем важен?">
+            <label>Заметки</label>
+            <textarea data-notes rows="4"></textarea>
+            <div class="row" style="margin-top:10px;">
+              <button class="btn ghost small" data-log>📝 В журнал</button>
+            </div>
+          `;
+          const name = el.querySelector("[data-name]");
+          const role = el.querySelector("[data-role]");
+          const notes = el.querySelector("[data-notes]");
+          name.value = n.name || "";
+          role.value = n.role || "";
+          notes.value = n.notes || "";
+
+          el.querySelector("[data-del]").addEventListener("click", ()=>{
+            if(!confirm("Удалить NPC?")) return;
+            state.world.npcs = state.world.npcs.filter(x=>x.id!==n.id);
+            scheduleSave();
+            renderWorld();
+          });
+
+          name.addEventListener("input", ()=>{ n.name = name.value; scheduleSave(); });
+          role.addEventListener("input", ()=>{ n.role = role.value; scheduleSave(); });
+          notes.addEventListener("input", ()=>{ n.notes = notes.value; scheduleSave(); });
+
+          el.querySelector("[data-log]").addEventListener("click", ()=>{
+            addQuickJournalLine(`NPC: ${n.name} — ${n.role || "—"}`);
+          });
+
+          npcGrid.appendChild(el);
+        }
+      }
+
+      if(state.world.locations.length === 0){
+        locGrid.innerHTML = `<div class="card"><b>Пока нет локаций.</b><div class="hint">Нажми “Локация” и веди заметки.</div></div>`;
+      }else{
+        for(const l of state.world.locations){
+          const el = document.createElement("div");
+          el.className = "card";
+          el.innerHTML = `
+            <div class="row">
+              <span class="pill">Локация</span>
+              <div class="spacer"></div>
+              <button class="btn small danger" data-del>🗑️</button>
+            </div>
+            <label>Название</label>
+            <input data-name>
+            <label>Теги</label>
+            <input data-tags placeholder="руины, город, лес...">
+            <label>Заметки</label>
+            <textarea data-notes rows="4"></textarea>
+            <div class="row" style="margin-top:10px;">
+              <button class="btn ghost small" data-log>📝 В журнал</button>
+            </div>
+          `;
+          const name = el.querySelector("[data-name]");
+          const tags = el.querySelector("[data-tags]");
+          const notes = el.querySelector("[data-notes]");
+          name.value = l.name || "";
+          tags.value = l.tags || "";
+          notes.value = l.notes || "";
+
+          el.querySelector("[data-del]").addEventListener("click", ()=>{
+            if(!confirm("Удалить локацию?")) return;
+            state.world.locations = state.world.locations.filter(x=>x.id!==l.id);
+            scheduleSave();
+            renderWorld();
+          });
+
+          name.addEventListener("input", ()=>{ l.name = name.value; scheduleSave(); });
+          tags.addEventListener("input", ()=>{ l.tags = tags.value; scheduleSave(); });
+          notes.addEventListener("input", ()=>{ l.notes = notes.value; scheduleSave(); });
+
+          el.querySelector("[data-log]").addEventListener("click", ()=>{
+            addQuickJournalLine(`Локация: ${l.name} (${l.tags||"без тегов"})`);
+          });
+
+          locGrid.appendChild(el);
+        }
+      }
+    }
+
+    $("#addNpcBtn").addEventListener("click", addNpc);
+    $("#addLocBtn").addEventListener("click", addLoc);
+
+    /**********************
+     * Combat (solo-friendly)
+     **********************/
+    function syncPcToCombat(){
+      const pc = state.pc;
+      const p = state.combat.participants.find(x=>x.type==="pc");
+      if(!p) return;
+      p.name = pc.name || "Персонаж";
+      p.maxHp = asNum(pc.maxHp, 10);
+      p.hp = clamp(asNum(pc.hp,10), 0, p.maxHp);
+      scheduleSave();
+    }
+
+    function ensurePcInCombat(){
+      const pc = state.pc;
+      let p = state.combat.participants.find(x=>x.type==="pc");
+      if(p) return p;
+      p = {
+        id: uid(),
+        type: "pc",
+        name: pc.name || "Персонаж",
+        hp: asNum(pc.hp,10),
+        maxHp: asNum(pc.maxHp,10),
+        initMod: 0,
+        initRoll: null,
+        initTotal: null,
+        status: "",
+        notes: ""
+      };
+      state.combat.participants.unshift(p);
+      scheduleSave();
+      return p;
+    }
+
+    $("#addPcToCombatBtn").addEventListener("click", ()=>{
+      ensurePcInCombat();
+      renderCombat();
+      renderInitOrder();
+    });
+
+    $("#syncPcCombatBtn").addEventListener("click", ()=>{
+      ensurePcInCombat();
+      syncPcToCombat();
+      renderCombat();
+      renderInitOrder();
+    });
+
+    $("#addMobBtn").addEventListener("click", ()=>{
+      const name = ($("#mobName").value || "").trim() || "Враг";
+      const count = clamp(asNum($("#mobCount").value, 1), 1, 30);
+      const hp = Math.max(0, asNum($("#mobMaxHp").value, 1));
+      const mod = asNum($("#mobInitMod").value, 0);
+
+      for(let i=1;i<=count;i++){
+        state.combat.participants.push({
+          id: uid(),
+          type: "mob",
+          name: count>1 ? `${name} #${i}` : name,
+          hp, maxHp: hp,
+          initMod: mod,
+          initRoll: null,
+          initTotal: null,
+          status: "",
+          notes: ""
+        });
+      }
+      scheduleSave();
+      renderCombat();
+      renderInitOrder();
+    });
+
+    $("#clearCombatBtn").addEventListener("click", ()=>{
+      if(!confirm("Очистить бой?")) return;
+      state.combat = { round: 1, turnIndex: 0, participants: [] };
+      scheduleSave();
+      renderCombat();
+      renderInitOrder();
+    });
+
+    function rollInitiative(){
+      for(const p of state.combat.participants){
+        p.initRoll = roll(20);
+        p.initTotal = p.initRoll + asNum(p.initMod, 0);
+      }
+      sortByInit();
+      state.combat.turnIndex = 0;
+      scheduleSave();
+      renderCombat();
+      renderInitOrder();
+    }
+
+    function sortByInit(){
+      state.combat.participants.sort((a,b)=>{
+        const dt = (asNum(b.initTotal,-999) - asNum(a.initTotal,-999));
+        if(dt !== 0) return dt;
+        const dr = (asNum(b.initRoll,-999) - asNum(a.initRoll,-999));
+        if(dr !== 0) return dr;
+        return String(a.name).localeCompare(String(b.name));
+      });
+      state.combat.turnIndex = clamp(state.combat.turnIndex, 0, Math.max(0, state.combat.participants.length-1));
+    }
+
+    $("#rollInitBtn").addEventListener("click", ()=>{
+      if(state.combat.participants.length === 0){
+        showError("Добавь хотя бы одного участника боя.");
+        setTimeout(()=>clearError(), 1200);
+        return;
+      }
+      rollInitiative();
+    });
+
+    $("#sortInitBtn").addEventListener("click", ()=>{
+      sortByInit();
+      scheduleSave();
+      renderCombat();
+      renderInitOrder();
+    });
+
+    $("#nextTurnBtn").addEventListener("click", ()=>{
+      const n = state.combat.participants.length;
+      if(n === 0) return;
+      state.combat.turnIndex = (state.combat.turnIndex + 1) % n;
+      if(state.combat.turnIndex === 0) state.combat.round += 1;
+      scheduleSave();
+      renderCombat();
+      renderInitOrder();
+    });
+
+    $("#prevTurnBtn").addEventListener("click", ()=>{
+      const n = state.combat.participants.length;
+      if(n === 0) return;
+      state.combat.turnIndex = (state.combat.turnIndex - 1 + n) % n;
+      scheduleSave();
+      renderCombat();
+      renderInitOrder();
+    });
+
+    $("#newRoundBtn").addEventListener("click", ()=>{
+      if(state.combat.participants.length === 0) return;
+      state.combat.round += 1;
+      state.combat.turnIndex = 0;
+      scheduleSave();
+      renderCombat();
+      renderInitOrder();
+    });
+
+    function adjustHp(pid, delta){
+      const p = state.combat.participants.find(x=>x.id===pid);
+      if(!p) return;
+      p.hp = clamp(asNum(p.hp,0) + delta, 0, Math.max(0, asNum(p.maxHp,0)));
+
+      // sync back to pc
+      if(p.type === "pc"){
+        state.pc.hp = p.hp;
+        state.pc.maxHp = Math.max(0, asNum(p.maxHp,0));
+        renderPc();
+      }
+
+      scheduleSave();
+      renderCombat();
+      renderInitOrder();
+    }
+
+    function removeParticipant(pid){
+      if(!confirm("Убрать участника из боя?")) return;
+      state.combat.participants = state.combat.participants.filter(x=>x.id!==pid);
+      state.combat.turnIndex = clamp(state.combat.turnIndex, 0, Math.max(0, state.combat.participants.length-1));
+      scheduleSave();
+      renderCombat();
+      renderInitOrder();
+    }
+
+    function renderInitOrder(){
+      const box = $("#initOrder");
+      box.innerHTML = "";
+      if(state.combat.participants.length === 0) return;
+
+      state.combat.participants.forEach((p,i)=>{
+        const el = document.createElement("div");
+        el.className = "init-item" + (i===state.combat.turnIndex ? " current" : "");
+        el.textContent = `${i+1}. ${p.name} (${p.initTotal ?? "—"})`;
+        el.title = "Клик — сделать ходом";
+        el.addEventListener("click", ()=>{
+          state.combat.turnIndex = i;
+          scheduleSave();
+          renderCombat();
+          renderInitOrder();
+        });
+        box.appendChild(el);
+      });
+
+      $("#roundPill").textContent = `Раунд: ${state.combat.round}`;
+      $("#turnPill").textContent = `Ход: ${state.combat.participants[state.combat.turnIndex]?.name || "—"}`;
+    }
+
+    function renderCombat(){
+      const host = $("#combatGrid");
+      host.innerHTML = "";
+
+      if(state.combat.participants.length === 0){
+        host.innerHTML = `<div class="card"><b>Бой пуст.</b><div class="hint">Добавь “моего персонажа” и врагов.</div></div>`;
+        $("#roundPill").textContent = `Раунд: ${state.combat.round}`;
+        $("#turnPill").textContent = `Ход: —`;
+        return;
+      }
+
+      state.combat.participants.forEach((p, i)=>{
+        const el = document.createElement("div");
+        el.className = "card" + (i===state.combat.turnIndex ? " turn" : "");
+        const init = p.initTotal != null ? `${p.initTotal} (d20:${p.initRoll} + ${asNum(p.initMod,0)})` : "—";
+
+        el.innerHTML = `
+          <div class="row">
+            <b>${p.name}</b>
+            <div class="spacer"></div>
+            <span class="pill">${p.type==="pc" ? "Ты" : "Враг"}</span>
+            <button class="btn small danger" data-rm>✖</button>
+          </div>
+
+          <div class="row" style="margin-top:8px;">
+            <span class="pill">Инициатива: ${init}</span>
+          </div>
+
+          <div class="two" style="margin-top:10px;">
+            <div>
+              <label>HP</label>
+              <input data-hp type="number" min="0" value="${asNum(p.hp,0)}">
+            </div>
+            <div>
+              <label>Max HP</label>
+              <input data-max type="number" min="0" value="${asNum(p.maxHp,0)}">
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn small danger" data-dmg5>-5</button>
+            <button class="btn small danger" data-dmg1>-1</button>
+            <button class="btn small success" data-heal1>+1</button>
+            <button class="btn small success" data-heal5>+5</button>
+            <div class="spacer"></div>
+            <button class="btn small ghost" data-focus>Ход</button>
+          </div>
+
+          <div class="two" style="margin-top:10px;">
+            <div>
+              <label>Init мод</label>
+              <input data-mod type="number" value="${asNum(p.initMod,0)}">
+            </div>
+            <div>
+              <label>Статус</label>
+              <input data-status value="${p.status||""}" placeholder="оглушён, яд...">
+            </div>
+          </div>
+
+          <label>Заметки</label>
+          <textarea data-notes rows="3" placeholder="концентрация, трюк, цель...">${p.notes||""}</textarea>
+        `;
+
+        el.querySelector("[data-rm]").addEventListener("click", ()=>removeParticipant(p.id));
+        el.querySelector("[data-dmg5]").addEventListener("click", ()=>adjustHp(p.id, -5));
+        el.querySelector("[data-dmg1]").addEventListener("click", ()=>adjustHp(p.id, -1));
+        el.querySelector("[data-heal1]").addEventListener("click", ()=>adjustHp(p.id, +1));
+        el.querySelector("[data-heal5]").addEventListener("click", ()=>adjustHp(p.id, +5));
+        el.querySelector("[data-focus]").addEventListener("click", ()=>{
+          state.combat.turnIndex = i;
+          scheduleSave();
+          renderCombat();
+          renderInitOrder();
+        });
+
+        const hp = el.querySelector("[data-hp]");
+        const max = el.querySelector("[data-max]");
+        const mod = el.querySelector("[data-mod]");
+        const st = el.querySelector("[data-status]");
+        const nt = el.querySelector("[data-notes]");
+
+        hp.addEventListener("input", ()=>{
+          p.hp = clamp(asNum(hp.value,0), 0, Math.max(0, asNum(p.maxHp,0)));
+          if(p.type==="pc"){ state.pc.hp = p.hp; renderPc(); }
+          scheduleSave();
+          renderInitOrder();
+        });
+
+        max.addEventListener("input", ()=>{
+          p.maxHp = Math.max(0, asNum(max.value,0));
+          p.hp = clamp(asNum(p.hp,0), 0, p.maxHp);
+          hp.value = String(p.hp);
+          if(p.type==="pc"){ state.pc.maxHp = p.maxHp; state.pc.hp = p.hp; renderPc(); }
+          scheduleSave();
+          renderInitOrder();
+        });
+
+        mod.addEventListener("input", ()=>{
+          p.initMod = asNum(mod.value,0);
+          scheduleSave();
+        });
+
+        st.addEventListener("input", ()=>{
+          p.status = st.value;
+          scheduleSave();
+        });
+
+        nt.addEventListener("input", ()=>{
+          p.notes = nt.value;
+          scheduleSave();
+        });
+
+        host.appendChild(el);
+      });
+
+      $("#roundPill").textContent = `Раунд: ${state.combat.round}`;
+      $("#turnPill").textContent = `Ход: ${state.combat.participants[state.combat.turnIndex]?.name || "—"}`;
+    }
+
+    /**********************
+     * Map: zoom + drag (no storage)
+     **********************/
+    let mapObjectUrl = null;
+    let mapScale = 1;
+    let mapPos = {x:0, y:0};
+    let dragging = false;
+    let dragStart = {x:0, y:0};
+
+    const mapImg = $("#mapImg");
+    const mapContainer = $("#mapContainer");
+
+    $("#mapFile").addEventListener("change", (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+
+      if(mapObjectUrl) URL.revokeObjectURL(mapObjectUrl);
+      mapObjectUrl = URL.createObjectURL(file);
+
+      mapImg.src = mapObjectUrl;
+      mapImg.style.display = "block";
+      mapScale = 1;
+      mapPos = {x:0,y:0};
+      mapImg.style.transform = `translate(${mapPos.x}px,${mapPos.y}px) scale(${mapScale})`;
+    });
+
+    $("#clearMapBtn").addEventListener("click", ()=>{
+      if(mapObjectUrl) URL.revokeObjectURL(mapObjectUrl);
+      mapObjectUrl = null;
+      mapImg.removeAttribute("src");
+      mapImg.style.display = "none";
+      $("#mapFile").value = "";
+    });
+
+    mapImg.addEventListener("mousedown", (e)=>{
+      dragging = true;
+      dragStart = { x: e.clientX - mapPos.x, y: e.clientY - mapPos.y };
+      mapImg.classList.add("dragging");
+      e.preventDefault();
+    });
+    document.addEventListener("mousemove", (e)=>{
+      if(!dragging) return;
+      mapPos.x = e.clientX - dragStart.x;
+      mapPos.y = e.clientY - dragStart.y;
+      mapImg.style.transform = `translate(${mapPos.x}px,${mapPos.y}px) scale(${mapScale})`;
+    });
+    document.addEventListener("mouseup", ()=>{
+      dragging = false;
+      mapImg.classList.remove("dragging");
+    });
+    mapContainer.addEventListener("wheel", (e)=>{
+      if(mapImg.style.display === "none") return;
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 0.9 : 1.1;
+      mapScale = clamp(mapScale * delta, 0.25, 6);
+      mapImg.style.transform = `translate(${mapPos.x}px,${mapPos.y}px) scale(${mapScale})`;
+    }, { passive:false });
+
+    /**********************
+     * Render all
+     **********************/
+    function renderAll(){
+      applyTheme();
+      renderScene();
+      renderPc();
+      renderJournal();
+      renderQuests();
+      renderWorld();
+      renderCombat();
+      renderInitOrder();
+
+      // seed result boxes if empty
+      if(!$("#twistResult").textContent.trim()) $("#twistResult").textContent = "—";
+      if(!$("#sceneSeedResult").textContent.trim()) $("#sceneSeedResult").textContent = "—";
+      if(!$("#oracleResult").textContent.trim()) $("#oracleResult").textContent = "—";
+      if(!$("#npcResult").textContent.trim()) $("#npcResult").textContent = "—";
+      if(!$("#lootResult").textContent.trim()) $("#lootResult").textContent = "—";
+      if(!$("#diceResult").textContent.trim()) $("#diceResult").textContent = "—";
+    }
+
+    // initial render
+    renderAll();
+    saveState(); // ensure storage initialized
+  </script>
+</body>
+</html>
